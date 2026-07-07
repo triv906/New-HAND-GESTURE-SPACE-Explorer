@@ -1,5 +1,7 @@
 import streamlit as st
 import cv2
+from streamlit_webrtc import webrtc_streamer
+import av
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
@@ -78,6 +80,21 @@ W, H = 1280, 720
 
 random.seed(42)
 np.random.seed(42)
+# 1. Define a function that processes each video frame
+def video_frame_callback(frame):
+    # Convert the incoming web frame to an OpenCV BGR image
+    img = frame.to_ndarray(format="bgr24")
+    
+    # ----------------------------------------------------
+    # INSERT YOUR HAND TRACKING / MEDIAPIPE CODE HERE
+    # e.g., results = hands.process(img)
+    # ----------------------------------------------------
+    
+    # Return the processed frame back to the browser screen
+    return av.VideoFrame.from_ndarray(img, format="bgr24")
+
+# 2. Add the component where you want the video to display
+webrtc_streamer(key="hand-gesture", video_frame_callback=video_frame_callback)
 
 NUM_STARS = 400
 stars = [(random.randint(0,W), random.randint(0,H),
